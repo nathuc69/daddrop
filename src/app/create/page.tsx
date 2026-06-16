@@ -33,7 +33,7 @@ export default function CreatePage() {
 
   const charCount = form.message.length
   const cardUrl = cardId
-    ? `${process.env.NEXT_PUBLIC_BASE_URL ?? window.location.origin}/card/${cardId}`
+    ? `${window.location.origin}/card/${cardId}`
     : ''
 
   async function handleSubmit(e: React.FormEvent) {
