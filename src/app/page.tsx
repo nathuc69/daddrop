@@ -1,65 +1,80 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useEffect } from 'react'
+import Link from 'next/link'
+import { trackEvent } from '@/lib/analytics'
+
+export default function LandingPage() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    trackEvent('landing_view', undefined, params.get('utm_source') ?? document.referrer ?? undefined)
+  }, [])
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <main className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 flex flex-col items-center justify-center px-4 py-16 text-center">
+      {/* Badge */}
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-sm text-amber-400">
+        🎁 Fête des pères — 21 juin
+      </div>
+
+      {/* Hero */}
+      <h1 className="max-w-sm text-4xl font-bold leading-tight text-white sm:text-5xl">
+        Une surprise<br />
+        <span className="text-amber-400">inoubliable</span><br />
+        pour ton papa
+      </h1>
+
+      <p className="mt-4 max-w-xs text-lg text-zinc-400">
+        Crée une carte magique en 2 minutes. Il reçoit un lien. Il n&apos;est pas prêt.
+      </p>
+
+      {/* CTA */}
+      <Link
+        href="/create"
+        className="mt-10 inline-flex items-center gap-2 rounded-full bg-amber-400 px-8 py-4 text-lg font-bold text-zinc-950 shadow-lg shadow-amber-500/30 transition-all hover:bg-amber-300 hover:shadow-amber-400/40 active:scale-95"
+      >
+        Crée une surprise pour ton papa →
+      </Link>
+
+      {/* Demo link */}
+      <Link
+        href="/card/demo"
+        className="mt-4 text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-300 transition-colors"
+      >
+        Voir la démo
+      </Link>
+
+      {/* How it works */}
+      <div className="mt-20 grid max-w-sm gap-6 text-left">
+        <Step n="1" title="Tu écris ton message" desc="Un texte du cœur, une photo optionnelle." />
+        <Step n="2" title="Tu envoies le lien" desc="Par SMS, WhatsApp, ou ce qui te convient." />
+        <Step n="3" title="Il vit la révélation" desc="Une animation surprise qu'il n'a jamais vue." />
+      </div>
+
+      {/* Envelope preview illustration */}
+      <div className="mt-20 animate-float text-8xl select-none" aria-hidden>
+        💌
+      </div>
+      <p className="mt-3 text-xs text-zinc-600">Gratuit · Sans inscription · 2 minutes</p>
+
+      {/* Watermark */}
+      <footer className="mt-16 text-xs text-zinc-700">
+        DadDrop · fait avec ❤️
+      </footer>
+    </main>
+  )
+}
+
+function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
+  return (
+    <div className="flex gap-4">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-sm font-bold text-amber-400">
+        {n}
+      </div>
+      <div>
+        <p className="font-semibold text-white">{title}</p>
+        <p className="text-sm text-zinc-400">{desc}</p>
+      </div>
     </div>
-  );
+  )
 }
