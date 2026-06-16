@@ -1,30 +1,26 @@
-import { createServiceClient } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import CardRevealClient from './CardRevealClient'
-import { Card } from '@/lib/types'
+import { getCard } from '@/lib/cards'
 
-const DEMO_CARD: Card = {
-  id: 'demo',
-  created_at: new Date().toISOString(),
-  sender_name: 'Léa',
-  recipient_name: 'Papa',
-  message:
-    'Papa,\n\nJe voulais juste te dire que tu es le meilleur papa du monde. Merci pour tout ce que tu fais pour nous, pour ta patience, tes blagues nulles (que j\'adore quand même 😄), et ton amour sans limite.\n\nBonne fête des pères ! 💛',
-  photo_url: null,
-  theme: 'fete_des_peres',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const card = await getCard(slug)
+  if (!card) return { title: 'Lien introuvable · DadDrop' }
+
+  // Personalised preview — without revealing the message (keep the surprise).
+  const title = `${card.sender_name} t'a préparé une surprise 🎁`
+  const description = 'Ouvre ton lien pour découvrir le message. Fête des pères · DadDrop'
+  return {
+    title,
+    description,
+    openGraph: { title, description, type: 'website' },
+  }
 }
-
-async function getCard(slug: string): Promise<Card | null> {
-  const db = createServiceClient()
-  const { data, error } = await db
-    .from('cards')
-    .select('*')
-    .eq('id', slug)
-    .single()
-  if (error || !data) return null
-  return data as Card
-}
-
 
 export default async function CardPage({
   params,
@@ -32,13 +28,8 @@ export default async function CardPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-
-  if (slug === 'demo') {
-    return <CardRevealClient card={DEMO_CARD} isDemo />
-  }
-
   const card = await getCard(slug)
   if (!card) notFound()
 
-  return <CardRevealClient card={card!} isDemo={false} />
+  return <CardRevealClient card={card} isDemo={slug === 'demo'} />
 }
